@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Encuesta Política Nacional · RD 2026</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Outfit:wght@300;400;500;600&display=swap');
+</style>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#0D0F14;
+  --surface:#13161E;
+  --surface2:#1A1E2A;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.13);
+  --text:#F0EEE8;
+  --muted:#8A8A9A;
+  --radius:14px;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Outfit','Segoe UI','Helvetica Neue',Arial,sans-serif;
+  min-height:100vh;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding:2.5rem 1rem 5rem;
+}
+
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 10%, rgba(26,90,160,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(100,30,30,0.10) 0%, transparent 60%);
+  pointer-events:none;
+  z-index:0;
+}
+
+.wrap{width:100%;max-width:580px;position:relative;z-index:1;}
+
+.header{text-align:center;margin-bottom:2rem;}
+
+.live-chip{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
+  border-radius:999px;padding:5px 14px;font-size:11px;font-weight:500;
+  color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px;
+}
+.live-chip .dot{width:6px;height:6px;border-radius:50%;background:#4ADE80;box-shadow:0 0 6px #4ADE80;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+.header h1{font-family:'Playfair Display',Georgia,'Times New Roman',serif;font-size:28px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:6px;}
+.header p{font-size:13px;color:var(--muted);font-weight:300;}
+
+.card{background:var(--surface);border-radius:20px;border:1px solid var(--border);overflow:hidden;}
+
+.prog-wrap{padding:1.25rem 1.75rem 0;}
+.prog-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:8px;}
+.prog-track{height:3px;background:rgba(255,255,255,0.07);border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,#3B82F6,#60A5FA);border-radius:99px;transition:width 0.5s cubic-bezier(.22,.61,.36,1);}
+
+.body{padding:1.75rem;}
+
+.step{display:none}
+.step.active{display:block;animation:rise 0.3s ease}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.q-num{font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.q-text{font-family:'Playfair Display',Georgia,'Times New Roman',serif;font-size:18px;font-weight:600;color:#fff;line-height:1.4;margin-bottom:1.25rem;}
+
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:1.5rem;}
+
+.opt{
+  background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);
+  padding:11px 14px;font-size:13px;font-weight:400;font-family:'Outfit','Segoe UI','Helvetica Neue',Arial,sans-serif;
+  color:var(--text);cursor:pointer;text-align:center;transition:all 0.18s;line-height:1.3;
+}
+.opt:hover{background:#1E2330;border-color:rgba(255,255,255,0.22);transform:translateY(-1px);}
+.opt.selected{border-width:1.5px;font-weight:500;transform:translateY(-1px);}
+
+.opt[data-party="PRM"].selected{background:rgba(59,130,246,0.12);border-color:#3B82F6;color:#93C5FD;}
+.opt[data-party="PLD"].selected{background:rgba(168,85,247,0.12);border-color:#A855F7;color:#D8B4FE;}
+.opt[data-party="FP"].selected{background:rgba(239,68,68,0.12);border-color:#EF4444;color:#FCA5A5;}
+.opt[data-party="PRD"].selected{background:rgba(249,115,22,0.12);border-color:#F97316;color:#FDBA74;}
+.opt[data-party="PRSC"].selected{background:rgba(34,197,94,0.12);border-color:#22C55E;color:#86EFAC;}
+.opt[data-party="APD"].selected{background:rgba(20,184,166,0.12);border-color:#14B8A6;color:#5EEAD4;}
+.opt.sel-neutral.selected{background:rgba(100,116,139,0.12);border-color:#64748B;color:#94A3B8;}
+
+.btn-next{
+  display:inline-flex;align-items:center;gap:8px;background:#fff;color:#0D0F14;
+  border:none;border-radius:var(--radius);padding:12px 26px;font-size:14px;
+  font-weight:600;font-family:'Outfit','Segoe UI','Helvetica Neue',Arial,sans-serif;cursor:pointer;transition:all 0.18s;
+}
+.btn-next:hover{background:#E5E7EB;transform:translateY(-1px)}
+.btn-next:active{transform:scale(0.98)}
+.btn-next:disabled{background:rgba(255,255,255,0.1);color:var(--muted);cursor:not-allowed;transform:none}
+
+.divider{height:1px;background:var(--border);margin:1.5rem 0;}
+
+.res-section{margin-bottom:1.5rem}
+.res-title{font-size:11px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+
+.res-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.res-label{font-size:12.5px;color:var(--text);min-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.res-track{flex:1;height:22px;background:rgba(255,255,255,0.05);border-radius:6px;overflow:hidden;}
+.res-bar{height:100%;border-radius:6px;transition:width 1s cubic-bezier(.22,.61,.36,1);}
+.res-pct{font-size:12px;font-weight:500;min-width:32px;text-align:right;color:var(--muted);}
+
+.thank-box{
+  background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.2);
+  border-radius:var(--radius);padding:14px 16px;font-size:13.5px;color:#86EFAC;
+  margin-bottom:1.5rem;display:flex;gap:10px;align-items:flex-start;
+}
+
+.share-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:1.5rem;}
+.share-label{font-size:12px;color:var(--muted)}
+.share-btn{
+  display:inline-flex;align-items:center;gap:6px;background:transparent;
+  border:1px solid var(--border2);border-radius:999px;padding:7px 16px;
+  font-size:12px;font-weight:500;font-family:'Outfit','Segoe UI','Helvetica Neue',Arial,sans-serif;cursor:pointer;
+  color:var(--text);transition:all 0.15s;
+}
+.share-btn:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.2)}
+
+.footer{text-align:center;margin-top:1.5rem;font-size:11.5px;color:var(--muted);}
+
+@media(max-width:480px){
+  .opts{grid-template-columns:1fr 1fr}
+  .body{padding:1.25rem}
+  .header h1{font-size:22px}
+  .res-label{min-width:90px;font-size:12px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="live-chip"><span class="dot"></span> Encuesta activa · Abril 2026</div>
+    <h1>Encuesta Política Nacional</h1>
+    <p>República Dominicana &nbsp;·&nbsp; Anónima y gratuita &nbsp;·&nbsp; 7 preguntas</p>
+  </div>
+
+  <div class="card">
+    <div class="prog-wrap">
+      <div class="prog-meta">
+        <span id="prog-label">Pregunta 1 de 7</span>
+        <span id="prog-pct">14%</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="prog" style="width:14%"></div></div>
+    </div>
+
+    <div class="body">
+
+      <!-- P1 -->
+      <div class="step active" id="s1">
+        <div class="q-num">Pregunta 1 de 7</div>
+        <div class="q-text">¿Por cuál partido votarías si las elecciones fueran hoy?</div>
+        <div class="opts" id="q1">
+          <button class="opt" data-val="PRM" data-party="PRM">
+            <span style="display:block;width:10px;height:10px;border-radius:50%;background:#3B82F6;margin:0 auto 6px;box-shadow:0 0 8px #3B82F6"></span>PRM
+          </button>
+          <button class="opt" data-val="PLD" data-party="PLD">
+            <span style="display:block;width:10px;height:10px;border-radius:50%;background:#A855F7;margin:0 auto 6px;box-shadow:0 0 8px #A855F7"></span>PLD
+          </button>
+          <button class="opt" data-val="FP" data-party="FP">
+            <span style="display:block;width:10px;height:10px;border-radius:50%;background:#EF4444;margin:0 auto 6px;box-shadow:0 0 8px #EF4444"></span>Fuerza del Pueblo
+          </button>
+          <button class="opt" data-val="PRD" data-party="PRD">
+            <span style="display:block;width:10px;height:10px;border-radius:50%;background:#F97316;margin:0 auto 6px;box-shadow:0 0 8px #F97316"></span>PRD
+          </button>
+          <button class="opt" data-val="PRSC" data-party="PRSC">
+            <span style="display:block;width:10px;height:10px;border-radius:50%;background:#22C55E;margin:0 auto 6px;box-shadow:0 0 8px #22C55E"></span>PRSC
+          </button>
+          <button class="opt" data-val="APD" data-party="APD">
+            <span style="display:block;width:10px;height:10px;border-radius:50%;background:#14B8A6;margin:0 auto 6px;box-shadow:0 0 8px #14B8A6"></span>APD
+          </button>
+          <button class="opt sel-neutral" data-val="Otro">Otro partido</button>
+          <button class="opt sel-neutral" data-val="Nulo">No votaría / Nulo</button>
+        </div>
+        <button class="btn-next" id="n1" disabled onclick="next(1,2)">Continuar →</button>
+      </div>
+
+      <!-- P2 -->
+      <div class="step" id="s2">
+        <div class="q-num">Pregunta 2 de 7</div>
+        <div class="q-text">¿Cómo evaluarías la gestión del gobierno actual?</div>
+        <div class="opts" id="q2">
+          <button class="opt sel-neutral" data-val="Muy buena">Muy buena</button>
+          <button class="opt sel-neutral" data-val="Buena">Buena</button>
+          <button class="opt sel-neutral" data-val="Regular">Regular</button>
+          <button class="opt sel-neutral" data-val="Mala">Mala</button>
+          <button class="opt sel-neutral" data-val="Muy mala">Muy mala</button>
+        </div>
+        <button class="btn-next" id="n2" disabled onclick="next(2,3)">Continuar →</button>
+      </div>
+
+      <!-- P3 -->
+      <div class="step" id="s3">
+        <div class="q-num">Pregunta 3 de 7</div>
+        <div class="q-text">¿Cuál es el problema más urgente del país?</div>
+        <div class="opts" id="q3">
+          <button class="opt sel-neutral" data-val="Delincuencia">Delincuencia</button>
+          <button class="opt sel-neutral" data-val="Economía">Economía / Costo de vida</button>
+          <button class="opt sel-neutral" data-val="Corrupción">Corrupción</button>
+          <button class="opt sel-neutral" data-val="Salud">Salud</button>
+          <button class="opt sel-neutral" data-val="Educación">Educación</button>
+          <button class="opt sel-neutral" data-val="Energía">Energía eléctrica</button>
+          <button class="opt sel-neutral" data-val="Empleo">Empleo</button>
+          <button class="opt sel-neutral" data-val="Otro">Otro</button>
+        </div>
+        <button class="btn-next" id="n3" disabled onclick="next(3,4)">Continuar →</button>
+      </div>
+
+      <!-- P4 -->
+      <div class="step" id="s4">
+        <div class="q-num">Pregunta 4 de 7</div>
+        <div class="q-text">¿Cuánta confianza tienes en la JCE?</div>
+        <div class="opts" id="q4">
+          <button class="opt sel-neutral" data-val="Mucha">Mucha confianza</button>
+          <button class="opt sel-neutral" data-val="Alguna">Alguna confianza</button>
+          <button class="opt sel-neutral" data-val="Poca">Poca confianza</button>
+          <button class="opt sel-neutral" data-val="Ninguna">Ninguna confianza</button>
+        </div>
+        <button class="btn-next" id="n4" disabled onclick="next(4,5)">Continuar →</button>
+      </div>
+
+      <!-- P5 -->
+      <div class="step" id="s5">
+        <div class="q-num">Pregunta 5 de 7</div>
+        <div class="q-text">¿Qué líder político te genera más confianza?</div>
+        <div class="opts" id="q5">
+          <button class="opt sel-neutral" data-val="Abinader">Luis Abinader</button>
+          <button class="opt sel-neutral" data-val="Danilo">Danilo Medina</button>
+          <button class="opt sel-neutral" data-val="Leonel">Leonel Fernández</button>
+          <button class="opt sel-neutral" data-val="Margarita">Margarita Cedeño</button>
+          <button class="opt sel-neutral" data-val="Otro">Otro líder</button>
+          <button class="opt sel-neutral" data-val="Ninguno">Ninguno</button>
+        </div>
+        <button class="btn-next" id="n5" disabled onclick="next(5,6)">Continuar →</button>
+      </div>
+
+      <!-- P6 -->
+      <div class="step" id="s6">
+        <div class="q-num">Pregunta 6 de 7</div>
+        <div class="q-text">¿Cuál es tu rango de edad?</div>
+        <div class="opts" id="q6">
+          <button class="opt sel-neutral" data-val="18-24">18–24</button>
+          <button class="opt sel-neutral" data-val="25-34">25–34</button>
+          <button class="opt sel-neutral" data-val="35-49">35–49</button>
+          <button class="opt sel-neutral" data-val="50-64">50–64</button>
+          <button class="opt sel-neutral" data-val="65+">65 o más</button>
+        </div>
+        <button class="btn-next" id="n6" disabled onclick="next(6,7)">Continuar →</button>
+      </div>
+
+      <!-- P7 -->
+      <div class="step" id="s7">
+        <div class="q-num">Pregunta 7 de 7</div>
+        <div class="q-text">¿En qué región resides?</div>
+        <div class="opts" id="q7">
+          <button class="opt sel-neutral" data-val="Distrito Nacional">Distrito Nacional</button>
+          <button class="opt sel-neutral" data-val="Gran Sto. Domingo">Gran Sto. Domingo</button>
+          <button class="opt sel-neutral" data-val="Norte / Cibao">Norte / Cibao</button>
+          <button class="opt sel-neutral" data-val="Sur">Sur</button>
+          <button class="opt sel-neutral" data-val="Este">Este</button>
+          <button class="opt sel-neutral" data-val="Exterior">Exterior</button>
+        </div>
+        <button class="btn-next" id="n7" disabled onclick="showResults()">Ver resultados →</button>
+      </div>
+
+      <!-- Results -->
+      <div class="step" id="results">
+        <div class="thank-box">
+          <span style="font-size:18px">✓</span>
+          <span>¡Gracias por participar! Resultados acumulados en tiempo real.</span>
+        </div>
+
+        <div class="res-section">
+          <div class="res-title">Intención de voto por partido</div>
+          <div id="res-parties"></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="res-section">
+          <div class="res-title">Principal problema del país</div>
+          <div id="res-problems"></div>
+        </div>
+
+        <div class="share-row">
+          <span class="share-label">Compartir:</span>
+          <button class="share-btn" onclick="copyLink(this)">🔗 Copiar enlace</button>
+          <button class="share-btn" onclick="shareWA()">📲 WhatsApp</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer">Encuesta ciudadana · Datos anónimos · República Dominicana 2026</div>
+</div>
+
+<script>
+const answers = {};
+
+const partyMeta = {
+  PRM:  { color:'#3B82F6', label:'PRM' },
+  PLD:  { color:'#A855F7', label:'PLD' },
+  FP:   { color:'#EF4444', label:'Fuerza del Pueblo' },
+  PRD:  { color:'#F97316', label:'PRD' },
+  PRSC: { color:'#22C55E', label:'PRSC' },
+  APD:  { color:'#14B8A6', label:'APD' },
+  Otro: { color:'#94A3B8', label:'Otro partido' },
+  Nulo: { color:'#475569', label:'No vota / Nulo' },
+};
+
+const simParties  = { PRM:42, PLD:13, FP:21, PRD:5, PRSC:4, APD:3, Otro:7, Nulo:5 };
+const simProblems = { Delincuencia:26, Economía:30, Corrupción:18, Salud:9, Educación:8, Energía:7, Empleo:10, Otro:3 };
+const probColors  = ['#F87171','#60A5FA','#FBBF24','#34D399','#A78BFA','#F97316','#2DD4BF','#94A3B8'];
+
+document.querySelectorAll('.opts').forEach(grid => {
+  grid.querySelectorAll('.opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      grid.querySelectorAll('.opt').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      answers[grid.id] = btn.dataset.val;
+      const nb = document.getElementById('n' + grid.id.replace('q',''));
+      if (nb) nb.disabled = false;
+    });
+  });
+});
+
+function next(from, to) {
+  document.getElementById('s'+from).classList.remove('active');
+  document.getElementById('s'+to).classList.add('active');
+  const pct = Math.round((to / 7) * 100);
+  document.getElementById('prog').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = 'Pregunta ' + to + ' de 7';
+  document.getElementById('prog-pct').textContent = pct + '%';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function showResults() {
+  document.getElementById('s7').classList.remove('active');
+  document.getElementById('results').classList.add('active');
+  document.getElementById('prog').style.width = '100%';
+  document.getElementById('prog-label').textContent = 'Completada';
+  document.getElementById('prog-pct').textContent = '100%';
+
+  if (answers.q1) simParties[answers.q1] = (simParties[answers.q1]||0) + 1;
+  if (answers.q3) simProblems[answers.q3] = (simProblems[answers.q3]||0) + 1;
+
+  renderParties();
+  renderProblems();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderParties() {
+  const el = document.getElementById('res-parties');
+  const total = Object.values(simParties).reduce((a,b)=>a+b,0);
+  const sorted = Object.entries(simParties).sort((a,b)=>b[1]-a[1]);
+  el.innerHTML = sorted.map(([key, val]) => {
+    const pct = Math.round((val/total)*100);
+    const m = partyMeta[key] || {color:'#94A3B8', label:key};
+    return `<div class="res-row">
+      <div class="res-label">
+        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${m.color};box-shadow:0 0 6px ${m.color};margin-right:7px;vertical-align:middle"></span>${m.label}
+      </div>
+      <div class="res-track">
+        <div class="res-bar" style="width:0%;background:${m.color}30;border-left:3px solid ${m.color}" data-w="${pct}"></div>
+      </div>
+      <div class="res-pct">${pct}%</div>
+    </div>`;
+  }).join('');
+  animateBars();
+}
+
+function renderProblems() {
+  const el = document.getElementById('res-problems');
+  const total = Object.values(simProblems).reduce((a,b)=>a+b,0);
+  const sorted = Object.entries(simProblems).sort((a,b)=>b[1]-a[1]);
+  el.innerHTML = sorted.map(([key, val], i) => {
+    const pct = Math.round((val/total)*100);
+    const c = probColors[i % probColors.length];
+    return `<div class="res-row">
+      <div class="res-label">${key}</div>
+      <div class="res-track">
+        <div class="res-bar" style="width:0%;background:${c}30;border-left:3px solid ${c}" data-w="${pct}"></div>
+      </div>
+      <div class="res-pct">${pct}%</div>
+    </div>`;
+  }).join('');
+  animateBars();
+}
+
+function animateBars() {
+  setTimeout(() => {
+    document.querySelectorAll('.res-bar').forEach(b => { b.style.width = b.dataset.w + '%'; });
+  }, 100);
+}
+
+function copyLink(btn) {
+  navigator.clipboard.writeText(window.location.href).catch(()=>{});
+  btn.textContent = '✓ ¡Copiado!';
+  setTimeout(() => btn.textContent = '🔗 Copiar enlace', 2500);
+}
+
+function shareWA() {
+  const txt = encodeURIComponent('Participa en esta encuesta política nacional de la República Dominicana 🇩🇴: ' + window.location.href);
+  window.open('https://wa.me/?text=' + txt, '_blank');
+}
+</script>
+</body>
+</html>
